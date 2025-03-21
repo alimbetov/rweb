@@ -1,7 +1,8 @@
-import apiClient from "../apidata/apiClient";
+// src/apidata/attributeService.ts
+import apiClient from "./apiClient";
 import { Attribute, AttributeValue, AttributeType } from "../types/types";
 
-// === Работа с атрибутами ===
+// === AUTH TOKEN interceptor ===
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -10,10 +11,11 @@ apiClient.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
+
+// ==================== АТРИБУТЫ ====================
+
 // Получить все атрибуты
 export const fetchAttributes = async (): Promise<Attribute[]> => {
   const response = await apiClient.get("/api/attributes");
@@ -34,10 +36,8 @@ export const fetchAttributeById = async (id: number): Promise<Attribute> => {
   return response.data;
 };
 
-// Создать новый атрибут
-export const createAttribute = async (
-  attribute: Attribute
-): Promise<Attribute> => {
+// Создать атрибут
+export const createAttribute = async (attribute: Attribute): Promise<Attribute> => {
   const response = await apiClient.post("/api/attributes", attribute);
   return response.data;
 };
@@ -70,61 +70,32 @@ export const fetchAttributeTypes = async (): Promise<AttributeType[]> => {
   return response.data;
 };
 
-// === Работа со значениями атрибутов ===
+// ==================== ЗНАЧЕНИЯ АТРИБУТОВ ====================
 
-// Получить все значения атрибутов
+// Получить все значения
 export const fetchAttributeValues = async (): Promise<AttributeValue[]> => {
   const response = await apiClient.get("/api/attributes/values");
   return response.data;
 };
 
-// Получить значение атрибута по ID
-export const fetchAttributeValueById = async (
-  id: number
-): Promise<AttributeValue> => {
+// Получить значение по ID
+export const fetchAttributeValueById = async (id: number): Promise<AttributeValue> => {
   const response = await apiClient.get(`/api/attributes/values/${id}`);
   return response.data;
 };
 
-// Создать значение атрибута
-export const createAttributeValue = async (
-  attributeValue: AttributeValue
-): Promise<AttributeValue> => {
-  const response = await apiClient.post(
-    "/api/attributes/values",
-    attributeValue
-  );
-  return response.data;
-};
+// Получить значения по attributeId
 
-// Обновить значение атрибута
-export const updateAttributeValue = async (
-  id: number,
-  attributeValue: AttributeValue
-): Promise<AttributeValue> => {
-  const response = await apiClient.put(
-    `/api/attributes/values/${id}`,
-    attributeValue
-  );
-  return response.data;
-};
-
-// Удалить значение атрибута
-export const deleteAttributeValue = async (id: number): Promise<void> => {
-  await apiClient.delete(`/api/attributes/values/${id}`);
-};
-
-// Найти значения атрибута по `attributeId`
 export const fetchAttributeValuesByAttribute = async (
   attributeId: number
 ): Promise<AttributeValue[]> => {
   const response = await apiClient.get(
-    `/api/attributes/values/attribute/${attributeId}`
+    `/api/attributes/values/attribute/${attributeId}` // ✅
   );
   return response.data;
 };
 
-// Поиск значений по подстроке
+// Поиск значений по тексту
 export const searchAttributeValues = async (
   query: string
 ): Promise<AttributeValue[]> => {
@@ -134,10 +105,30 @@ export const searchAttributeValues = async (
   return response.data;
 };
 
-// Получить публичные значения
-export const fetchPublicAttributeValues = async (): Promise<
-  AttributeValue[]
-> => {
+// Получить только публичные значения
+export const fetchPublicAttributeValues = async (): Promise<AttributeValue[]> => {
   const response = await apiClient.get("/api/attributes/values/public");
   return response.data;
+};
+
+// Создать значение
+export const createAttributeValue = async (
+  value: AttributeValue
+): Promise<AttributeValue> => {
+  const response = await apiClient.post("/api/attributes/values", value);
+  return response.data;
+};
+
+// Обновить значение
+export const updateAttributeValue = async (
+  id: number,
+  value: AttributeValue
+): Promise<AttributeValue> => {
+  const response = await apiClient.put(`/api/attributes/values/${id}`, value);
+  return response.data;
+};
+
+// Удалить значение
+export const deleteAttributeValue = async (id: number): Promise<void> => {
+  await apiClient.delete(`/api/attributes/values/${id}`);
 };

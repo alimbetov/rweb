@@ -80,6 +80,10 @@ const AttributeValueList: React.FC = () => {
           attributeId: Number(attributeId),
           value: newValue,
           isPublic,
+          valueRu: "",
+          valueKz: "",
+          valueEn: "",
+          attributeCode: ""
         });
       } else {
         await createAttributeValue({
@@ -87,6 +91,10 @@ const AttributeValueList: React.FC = () => {
           attributeId: Number(attributeId),
           value: newValue,
           isPublic,
+          valueRu: "",
+          valueKz: "",
+          valueEn: "",
+          attributeCode: ""
         });
       }
 

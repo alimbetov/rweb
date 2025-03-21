@@ -71,7 +71,8 @@ export interface AttributeValue {
   id: number;
   attributeId: number;
   value: string;
-  isPublic: boolean;
+  isPublic:
+  boolean;
 }
 
 // Enum для типов атрибутов

@@ -28,6 +28,8 @@ import ProductAttributesForm from "./pages/ProductAttributesForm";
 import ProfileForm from "./pages/ProfileForm";
 import AddressManager from "./pages/AddressManager";
 import AddressForm from "./pages/AddressForm";
+import AttributeFormPage from "./pages/AttributeFormPage.tsx";
+import AttributeValueList from "./pages/AttributeValueList.tsx";
 
 // ✅ Страница 404
 const NotFound = () => (
@@ -107,11 +109,11 @@ const router = createBrowserRouter([
 
           // ✅ Атрибуты
           { path: "mod/attributes", element: <AttributeList /> },
-          { path: "mod/attributes/new", element: <CreateAttributePage /> },
-          { path: "mod/attributes/:id/edit", element: <EditAttributePage /> },
+          { path: "mod/attributes/new", element: <AttributeFormPage /> },
+          { path: "mod/attributes/:id/edit", element: <AttributeFormPage /> },
+           
           {
-            path: "mod/attributes/:attributeId/values",
-            element: <AttributeValuesPage />,
+            path: "mod/attributes/:attributeId/values", element: <AttributeValueList />,
           },
 
           // ✅ Товары
