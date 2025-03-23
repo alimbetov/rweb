@@ -21,6 +21,11 @@ const CityList: React.FC = () => {
     navigate(`/mod/cities/edit/${cityCode}`);
   };
 
+  const handleMapEdit = (cityCode: string) => {
+    navigate(`/mod/cities/map/${cityCode}`);
+  };
+ 
+
   const handleDelete = async (cityCode: string) => {
     await deleteCity(cityCode);
     loadCities();
@@ -92,6 +97,12 @@ const CityList: React.FC = () => {
                   className="px-2 py-1 bg-yellow-500 text-white rounded mr-2"
                 >
                   Редактировать
+                </button>
+                <button
+                  onClick={() => handleMapEdit(city.cityCode)}
+                  className="px-2 py-1 bg-yellow-500 text-white rounded mr-2"
+                >
+                  geo позиция
                 </button>
                 <button
                   onClick={() => handleDelete(city.cityCode)}

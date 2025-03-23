@@ -30,6 +30,7 @@ import AddressManager from "./pages/AddressManager";
 import AddressForm from "./pages/AddressForm";
 import AttributeFormPage from "./pages/AttributeFormPage.tsx";
 import AttributeValueList from "./pages/AttributeValueList.tsx";
+import CityMapPage from "./pages/CityMapPage.tsx";
 
 // ✅ Страница 404
 const NotFound = () => (
@@ -79,6 +80,12 @@ const router = createBrowserRouter([
             path: "mod/cities/edit/:cityCode",
             element: <CityForm isEditMode={true} />,
           },
+          { path: "mod/cities/map/:cityCode", element: <CityMapPage /> },
+
+          
+
+
+
 
           // ✅ Группы категорий
           { path: "mod/category-groups", element: <CategoryGroupList /> },

@@ -183,3 +183,11 @@ export interface LanguageDTO {
   name: string;
   shortName?: string; // ru / kz / en
 }
+
+
+export interface CityCoordinates {
+  id?: number;
+  cityCode: string;
+  latitude: number;
+  longitude: number;
+}
