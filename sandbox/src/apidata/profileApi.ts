@@ -6,6 +6,7 @@ import {
   LanguageDTO,
   CurrencyDTO,
   CityLocalDto,
+  AddressCoordinatesDTO,
 } from "../types/types";
 
 // 🔹 Автоматическое добавление токена в заголовок Authorization
@@ -114,4 +115,36 @@ export const updateUserAddress = async (
 // 🔹 Удалить адрес
 export const deleteUserAddress = async (id: number): Promise<void> => {
   await apiClient.delete(`/api/profile/addresses/${id}`);
+};
+
+
+
+// ========================== 🧭 Координаты адресов ==========================
+
+
+// 🔹 Получить координаты адреса
+export const fetchAddressCoordinates = async (
+  addressId: number
+): Promise<AddressCoordinatesDTO> => {
+  const response = await apiClient.get(`/api/profile/address/${addressId}/coordinates`);
+  return response.data;
+};
+
+// 🔹 Обновить координаты адреса
+export const updateAddressCoordinates = async (
+  addressId: number,
+  latitude: number,
+  longitude: number
+): Promise<void> => {
+  await apiClient.put(`/api/profile/address/${addressId}/coordinates`, null, {
+    params: {
+      latitude,
+      longitude,
+    },
+  });
+};
+
+// 🔹 Очистить координаты адреса
+export const clearAddressCoordinates = async (addressId: number): Promise<void> => {
+  await apiClient.delete(`/api/profile/address/${addressId}/coordinates`);
 };

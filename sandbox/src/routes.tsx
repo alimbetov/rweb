@@ -31,6 +31,7 @@ import AddressForm from "./pages/AddressForm";
 import AttributeFormPage from "./pages/AttributeFormPage.tsx";
 import AttributeValueList from "./pages/AttributeValueList.tsx";
 import CityMapPage from "./pages/CityMapPage.tsx";
+import AddressMapPage from "./pages/AddressMapPage.tsx";
 
 // ✅ Страница 404
 const NotFound = () => (
@@ -136,6 +137,11 @@ const router = createBrowserRouter([
           { path: "guser/addresses", element: <AddressManager /> },
           { path: "guser/addresses/new", element: <AddressForm /> }, // ✅ Создание товара
           { path: "guser/addresses/edit/:id", element: <AddressForm /> }, // ✅ Редактирование товара
+          { path: "guser/address/:addressId/map", element: <AddressMapPage /> }, // ✅ Редактирование товара
+
+
+
+
         ],
       },
 

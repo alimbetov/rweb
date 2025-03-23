@@ -74,6 +74,14 @@ const AddressManager: React.FC = () => {
                   ✏
                 </button>
                 <button
+                  onClick={() =>
+                    navigate(`/guser/address/${address.id}/map`)
+                  }
+                  className="text-blue-500"
+                >
+                  🌍 
+                </button>        
+                <button
                   onClick={() => handleDeleteAddress(address.id)}
                   className="text-red-500"
                 >

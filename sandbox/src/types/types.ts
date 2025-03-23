@@ -191,3 +191,13 @@ export interface CityCoordinates {
   latitude: number;
   longitude: number;
 }
+
+export interface AddressCoordinatesDTO {
+  id?: number;
+  title?: string;
+  citLatitude: number;
+  citLongitude: number;
+  latitude?: number;
+  longitude?: number;
+  edition?: boolean;
+}
