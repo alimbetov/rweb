@@ -1,6 +1,6 @@
 // src/api/offerApi.ts
 import apiClient from "./apiClient";
-import { OfferFormDTO } from "../types/types"; // путь может отличаться
+import { CityLocalDto, OfferFormDTO } from "../types/types"; // путь может отличаться
 import { AxiosResponse } from "axios";
 
 
@@ -44,7 +44,7 @@ export const updateOfferForm = async (offer: OfferFormDTO): Promise<OfferFormDTO
 /**
  * 📥 Получение офферов с фильтрацией (GET /api/offers/filter)
  */
-export const fetchFilteredOffers = async (params: {
+export const fetchFilteredOffers_old = async (params: {
   productId?: number;
   status?: string;
   other?: boolean;
@@ -57,5 +57,49 @@ export const fetchFilteredOffers = async (params: {
   totalPages: number;
 }> => {
   const response = await apiClient.get("/api/offers/filter", { params });
+  return response.data;
+};
+
+interface OfferFilterParams {
+  productId?: number;
+  status?: string;
+  other?: boolean;
+  page?: number;
+  size?: number;
+  sort?: string;
+  cities?: CityLocalDto[]; // <-- добавлено!
+}
+
+export const fetchFilteredOffers = async (params: OfferFilterParams): Promise<{
+  content: OfferFormDTO[];
+  totalElements: number;
+  totalPages: number;
+}> => {
+  // 🔍 Разделим параметры
+  const { productId, status, other, page, size, sort, cities } = params;
+
+  // 📦 Query-параметры (идут в URL)
+  const queryParams = {
+    productId,
+    status,
+    other,
+    page,
+    size,
+    sort,
+  };
+
+  // 📦 Body-параметры
+  const body = {
+    cities: cities ?? [], // если undefined — передаем пустой список
+  };
+
+  const response: AxiosResponse<any> = await apiClient.post(
+    "/api/offers/filter",
+    body,
+    {
+      params: queryParams,
+    }
+  );
+
   return response.data;
 };

@@ -156,6 +156,7 @@ export interface ProfileDTO {
   userId: number;
   phoneContacts: PhoneContactDTO[];
   addresses: AddressDTO[];
+  country?: CountryLocalDto;
 }
 
 export interface AddressDTO {
@@ -172,6 +173,12 @@ export interface CityLocalDto {
   cityCode: string;
   name: string;
 }
+
+export interface CountryLocalDto {
+  code: string;
+  name: string;
+}
+
 export interface CurrencyDTO {
   code: string;
   name: string;

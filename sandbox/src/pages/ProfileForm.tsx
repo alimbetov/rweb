@@ -6,6 +6,7 @@ import {
   fetchLanguages,
   fetchCurrencies,
   fetchUserPhones,
+  fetchCountries,
   addUserPhone,
   updateUserPhone,
   deleteUserPhone,
@@ -15,6 +16,7 @@ import {
   LanguageDTO,
   CurrencyDTO,
   PhoneContactDTO,
+  CountryLocalDto
 } from "../types/types";
 
 const DEFAULT_AVATAR = "https://via.placeholder.com/100?text=Avatar"; // 🔹 Дефолтное фото
@@ -23,6 +25,7 @@ const ProfileForm: React.FC = () => {
   const [profile, setProfile] = useState<ProfileDTO | null>(null);
   const [languages, setLanguages] = useState<LanguageDTO[]>([]);
   const [currencies, setCurrencies] = useState<CurrencyDTO[]>([]);
+  const [countries, setCountries] = useState<CountryLocalDto[]>([]);
   const [phones, setPhones] = useState<PhoneContactDTO[]>([]);
   const [activeTab, setActiveTab] = useState("profile");
   const [loading, setLoading] = useState(true);
@@ -34,6 +37,7 @@ const ProfileForm: React.FC = () => {
         setProfile(profileData);
         setLanguages(await fetchLanguages());
         setCurrencies(await fetchCurrencies());
+        setCountries(await fetchCountries());
         if (profileData) {
           setPhones(await fetchUserPhones());
         }
@@ -63,7 +67,13 @@ const ProfileForm: React.FC = () => {
         ...profile,
         preferredCurrency: { ...profile.preferredCurrency, code: value },
       });
-    } else {
+    } else if (name === "country.code") {
+      setProfile({
+        ...profile,
+        country: { ...profile.country, code: value },
+      });
+    }
+    else {
       setProfile({ ...profile, [name]: value });
     }
   };
@@ -221,6 +231,32 @@ const ProfileForm: React.FC = () => {
                 ))}
               </select>
             </div>
+
+            {/* Выбор страны */}
+            <div className="sm:col-span-2">
+  <label className="block text-sm font-medium">🌍 Страна</label>
+
+  {countries.length === 0 ? (
+    <div className="text-sm text-gray-500 bg-gray-100 p-2 rounded">
+      ⏳ Загрузка списка стран...
+    </div>
+  ) : (
+    <select
+      name="country.code"
+      value={profile?.country?.code || ""}
+      onChange={handleProfileChange}
+      className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 transition"
+    >
+      <option value="">Не выбрано</option>
+      {countries.map((c) => (
+        <option key={c.code} value={c.code}>
+          {c.name}
+        </option>
+      ))}
+    </select>
+  )}
+</div>
+
 
             {/* Выбор валюты */}
             <div>

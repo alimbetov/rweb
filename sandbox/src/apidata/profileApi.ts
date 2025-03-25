@@ -7,6 +7,7 @@ import {
   CurrencyDTO,
   CityLocalDto,
   AddressCoordinatesDTO,
+  CountryLocalDto,
 } from "../types/types";
 
 // 🔹 Автоматическое добавление токена в заголовок Authorization
@@ -94,6 +95,12 @@ export const fetchCities = async (): Promise<CityLocalDto[]> => {
   const response = await apiClient.get("/api/profile/cities");
   return response.data;
 };
+
+export const fetchCountries = async (): Promise<CountryLocalDto[]> => {
+  const response = await apiClient.get("/api/profile/countries");
+  return response.data;
+};
+
 
 // 🔹 Добавить адрес
 export const addUserAddress = async (
