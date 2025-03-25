@@ -201,3 +201,51 @@ export interface AddressCoordinatesDTO {
   longitude?: number;
   edition?: boolean;
 }
+
+export interface CatalogNodeDto {
+  id: string;
+  title: string;
+  action: boolean;
+  children?: CatalogNodeDto[];
+}
+
+
+
+// src/types/types.ts
+
+export interface OfferAttributeFormDTO {
+  id: number;
+  attributeId: number;
+  attributeTitle?: string;
+  productId: number;
+  type: "STRING" | "NUMBER" | "ENUM" | "BOOLEAN" | "MULTISELECT"; // адаптируй под твои значения
+
+  inputTextValue?: string;
+  inputNumberValue?: number;
+  numberLimit?: number;
+  inputCheckValue?: boolean;
+
+  inputSelectedValues?: string[];
+  enumRangeList?: string[];
+  multiSelectRangeList?: string[];
+}
+
+
+
+export interface OfferFormDTO {
+  offerId: number;
+  createdAt: string;
+  updatedAt: string;
+  offerPhotoUrl?: string;
+  price: number;
+  description?: string;
+  productId: number;
+  categoryCode: string;
+  subCategoryCode?: string;
+  preferredCurrency: "USD" | "KZT" | "RUB";
+  status: "DRFT" | "ACTV" | "ARCH" | "PNDG" | "REJC";
+  addressId: number;
+  cityCode: string;
+  profileId: string;
+  offerAttributeFormList: OfferAttributeFormDTO[];
+}

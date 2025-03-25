@@ -98,6 +98,21 @@ export default function Dashboard() {
           </div>
         )}
 
+
+        {/* ✅ Ссылка для USER */}
+        {(roles?.includes("ROLE_USER")) && (
+          <div className="bg-white shadow-md p-6 rounded-lg hover:shadow-lg transition">
+            <Link
+              to="guser/products/tree"
+              className="mt-4 inline-block bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+            >
+              🔗 Каталог товаров и  услуг
+            </Link>
+          </div>
+        )}
+
+
+
         {/* ✅ Ссылка для ADMIN и INSPECTOR */}
         {(roles?.includes("ROLE_ADMIN") ||
           roles?.includes("ROLE_INSPECTOR")) && (
@@ -122,6 +137,8 @@ export default function Dashboard() {
             </Link>
           </div>
         )}
+
+
       </div>
     </div>
   );
