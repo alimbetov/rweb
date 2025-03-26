@@ -1,6 +1,6 @@
 // src/api/offerApi.ts
 import apiClient from "./apiClient";
-import { CityLocalDto, OfferFormDTO } from "../types/types"; // путь может отличаться
+import { AddressLocalDTO, CityLocalDto, OfferFormDTO } from "../types/types"; // путь может отличаться
 import { AxiosResponse } from "axios";
 
 
@@ -16,6 +16,20 @@ apiClient.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+// 🔹 Получить список адресов
+export const fetchUserLocalAddresses = async (): Promise<AddressLocalDTO[]> => {
+  const response =
+    await apiClient.get("/api/profile/local-addresses");
+  return response.data;
+};
+
+// 🔹 Получить  адрес
+export const fetchUserPubAddress = async (id: number): Promise<AddressLocalDTO> => {
+  const response = await apiClient.get(`/api/profile/pub-addresses/${id}`);
+  return response.data;
+};
+
 /**
  * 🔁 Генерация нового оффера (POST /api/offers/generate)
  */
@@ -103,3 +117,5 @@ export const fetchFilteredOffers = async (params: OfferFilterParams): Promise<{
 
   return response.data;
 };
+
+

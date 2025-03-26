@@ -256,3 +256,8 @@ export interface OfferFormDTO {
   profileId: string;
   offerAttributeFormList: OfferAttributeFormDTO[];
 }
+
+export interface AddressLocalDTO {
+  id: number;
+  title: string;
+}

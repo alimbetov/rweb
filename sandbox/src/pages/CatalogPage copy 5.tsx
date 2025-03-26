@@ -23,21 +23,6 @@ const CatalogPage: React.FC = () => {
     setSelectedLeaf(node);
   };
 
-  const handleCreateOffer = async () => {
-    if (!selectedLeaf) return;
-    const confirmed = window.confirm(`Создать оффер для "${selectedLeaf.title}"?`);
-    if (!confirmed) return;
-
-    try {
-      await generateOfferForm(Number(selectedLeaf.id));
-      alert("✅ Оффер успешно создан");
-      console.log("🔨 Оффер создан для productId:", selectedLeaf.id);
-      // При необходимости: обнови список офферов здесь
-    } catch (e) {
-      alert("❌ Ошибка при создании оффера");
-    }
-  };
-
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-50 px-4 py-6">
       {/* 🔍 Поиск */}
@@ -74,43 +59,44 @@ const CatalogPage: React.FC = () => {
             <p className="text-gray-400 text-center">⬅️ Выберите элемент из каталога</p>
           ) : (
             <>
-              {/* Tabs */}
-              <div className="mb-4 border-b flex justify-between items-center">
-                <div className="space-x-2">
-                  <button
-                    className={`pb-2 px-3 border-b-2 font-medium ${
-                      tab === "mine"
-                        ? "border-blue-600 text-blue-600"
-                        : "border-transparent text-gray-500 hover:text-blue-500"
-                    }`}
-                    onClick={() => setTab("mine")}
-                  >
-                    🧍‍♂️ Мои офферы
-                  </button>
-                  <button
-                    className={`pb-2 px-3 border-b-2 font-medium ${
-                      tab === "others"
-                        ? "border-blue-600 text-blue-600"
-                        : "border-transparent text-gray-500 hover:text-blue-500"
-                    }`}
-                    onClick={() => setTab("others")}
-                  >
-                    🌍 Офферы других
-                  </button>
-                </div>
+              {selectedLeaf.action && (
+                <button
+                  onClick={() =>
+                    generateOfferForm(Number(selectedLeaf.id)).then(() => {
+                      alert("✅ Оффер успешно создан");
+                      console.log("🔨 Оффер создан для productId:", selectedLeaf.id);
+                    })
+                  }
+                  className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition mb-4"
+                >
+                  ➕ Создать оффер
+                </button>
+              )}
 
-                {/* Кнопка ➕ "Создать оффер" для вкладки "Мои офферы" */}
-                {tab === "mine" && selectedLeaf?.action && (
-                  <button
-                    onClick={handleCreateOffer}
-                    className="text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition"
-                  >
-                    ➕ Создать оффер
-                  </button>
-                )}
+              {/* Tabs */}
+              <div className="mb-4 border-b">
+                <button
+                  className={`pb-2 px-3 border-b-2 font-medium ${
+                    tab === "mine"
+                      ? "border-blue-600 text-blue-600"
+                      : "border-transparent text-gray-500 hover:text-blue-500"
+                  }`}
+                  onClick={() => setTab("mine")}
+                >
+                  🧍‍♂️ Мои офферы
+                </button>
+                <button
+                  className={`pb-2 px-3 border-b-2 font-medium ${
+                    tab === "others"
+                      ? "border-blue-600 text-blue-600"
+                      : "border-transparent text-gray-500 hover:text-blue-500"
+                  }`}
+                  onClick={() => setTab("others")}
+                >
+                  🌍 Офферы других
+                </button>
               </div>
 
-              {/* Контент вкладок */}
               {tab === "mine" && (
                 <OfferList
                   productId={Number(selectedLeaf.id)}

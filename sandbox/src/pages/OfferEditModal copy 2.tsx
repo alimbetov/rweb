@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { OfferFormDTO, OfferAttributeFormDTO, AddressLocalDTO } from "../types/types";
-import { updateOfferForm, fetchUserLocalAddresses, fetchUserPubAddress } from "../apidata/offerApi";
+import { updateOfferForm , fetchUserLocalAddresses} from "../apidata/offerApi";
 
 import AttributeTabs from "./AttributeTabs";
 
@@ -13,33 +13,31 @@ interface Props {
 const OfferEditModal: React.FC<Props> = ({ offer, onClose, onSaved }) => {
   const [form, setForm] = useState<OfferFormDTO>(offer);
   const [saving, setSaving] = useState(false);
-  const [addresses, setAddresses] = useState<AddressLocalDTO[]>([]);
+  const [addresses, setAddresses] = useState<AddressLocalDTO[]>([]); // 👈 список адресов
   const [loadingAddresses, setLoadingAddresses] = useState(true);
 
-  // 👇 Загрузка всех адресов + текущего (если его нет в списке)
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleEsc);
+    return () => document.removeEventListener("keydown", handleEsc);
+  }, [onClose]);
+
+  // 👇 загружаем адреса
   useEffect(() => {
     const loadAddresses = async () => {
       try {
         const data = await fetchUserLocalAddresses();
-        let result = data;
-
-        // Проверка: если текущий addressId не найден — подгрузи его отдельно
-        const exists = data.find(addr => addr.id === offer.addressId);
-        if (!exists && offer.addressId) {
-          const single = await fetchUserPubAddress(offer.addressId);
-          result = [...data, single];
-        }
-
-        setAddresses(result);
+        setAddresses(data);
       } catch (e) {
         alert("⚠️ Ошибка загрузки адресов");
       } finally {
         setLoadingAddresses(false);
       }
     };
-
     loadAddresses();
-  }, [offer.addressId]);
+  }, []);
 
   const handleAddressChange = (id: number) => {
     const selected = addresses.find((a) => a.id === id);
