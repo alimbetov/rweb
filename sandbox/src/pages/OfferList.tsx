@@ -7,10 +7,14 @@ import OfferEditModal from "./OfferEditModal";
 interface Props {
   productId: number;
   other: boolean;
-  showStatusFilter: boolean;
+  customFilter?: {
+    cities?: string[];
+    offerAttributeFormList?: any[];
+  };
+  showStatusFilter?: boolean;
 }
 
-const OfferList: React.FC<Props> = ({ productId, other, showStatusFilter }) => {
+const OfferList: React.FC<Props> = ({ productId, other, showStatusFilter, customFilter }) => {
   const [offers, setOffers] = useState<OfferFormDTO[]>([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -22,10 +26,11 @@ const OfferList: React.FC<Props> = ({ productId, other, showStatusFilter }) => {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   const [cities, setCities] = useState<CityLocalDto[]>([]);
-  const [selectedCityCodes, setSelectedCityCodes] = useState<string[]>([]);
   const [pendingCityCodes, setPendingCityCodes] = useState<string[]>([]);
+  const [pendingStatus, setPendingStatus] = useState<string>("");
 
-  const [status, setStatus] = useState<string>("");
+  const [appliedCityCodes, setAppliedCityCodes] = useState<string[]>([]);
+  const [appliedStatus, setAppliedStatus] = useState<string>("");
 
   useEffect(() => {
     fetchCities().then(setCities).catch(console.error);
@@ -33,14 +38,10 @@ const OfferList: React.FC<Props> = ({ productId, other, showStatusFilter }) => {
 
   useEffect(() => {
     loadOffers();
-  }, [productId, other, page, sortField, sortOrder, selectedCityCodes, status]);
+  }, [productId, other, page, sortField, sortOrder, appliedCityCodes, appliedStatus, customFilter]);
 
   const loadOffers = () => {
     setLoading(true);
-
-    const selectedCities: CityLocalDto[] = cities.filter((c) =>
-      selectedCityCodes.includes(c.cityCode)
-    );
 
     fetchFilteredOffers({
       productId,
@@ -48,8 +49,9 @@ const OfferList: React.FC<Props> = ({ productId, other, showStatusFilter }) => {
       page,
       size: 5,
       sort: `${sortField},${sortOrder}`,
-      status: showStatusFilter ? status || undefined : undefined,
-      cities: selectedCities,
+      status: appliedStatus,
+      cities: appliedCityCodes,
+      ...customFilter,
     })
       .then((res) => {
         setOffers(res.content);
@@ -60,127 +62,108 @@ const OfferList: React.FC<Props> = ({ productId, other, showStatusFilter }) => {
   };
 
   const handleSaved = (updated: OfferFormDTO) => {
-    setOffers((prev) =>
-      prev.map((o) => (o.offerId === updated.offerId ? updated : o))
-    );
+    setOffers((prev) => prev.map((o) => (o.offerId === updated.offerId ? updated : o)));
+  };
+
+  const handleApplyFilters = () => {
+    setAppliedCityCodes(pendingCityCodes);
+    setAppliedStatus(pendingStatus);
+    setPage(0);
+  };
+
+  const handleResetFilters = () => {
+    setPendingCityCodes([]);
+    setPendingStatus("");
+    setAppliedCityCodes([]);
+    setAppliedStatus("");
+    setPage(0);
   };
 
   return (
     <div>
       {/* 📦 Фильтры */}
       <div className="flex flex-col gap-4 mb-4">
+        <details className="border rounded bg-white shadow p-3" open>
+          <summary className="cursor-pointer text-sm font-medium text-blue-600">🔽 Сортировка</summary>
+          <div className="mt-2">
+            <label className="text-sm font-medium text-gray-700">Выберите:</label>
+            <select
+              value={`${sortField},${sortOrder}`}
+              onChange={(e) => {
+                const [field, order] = e.target.value.split(",");
+                setSortField(field);
+                setSortOrder(order as "asc" | "desc");
+                setPage(0);
+              }}
+              className="border rounded px-2 py-1 text-sm mt-1"
+            >
+              <option value="updatedAt,desc">🕒 По дате (новые → старые)</option>
+              <option value="updatedAt,asc">🕒 По дате (старые → новые)</option>
+              <option value="price,asc">💰 Цена (по возрастанию)</option>
+              <option value="price,desc">💰 Цена (по убыванию)</option>
+            </select>
+          </div>
+        </details>
 
-{/* 🔽 Сортировка */}
-<details className="border rounded bg-white shadow p-3" open>
-  <summary className="cursor-pointer text-sm font-medium text-blue-600">
-    🔽 Сортировка
-  </summary>
-  <div className="mt-2">
-    <label className="text-sm font-medium text-gray-700">Выберите:</label>
-    <select
-      value={`${sortField},${sortOrder}`}
-      onChange={(e) => {
-        const [field, order] = e.target.value.split(",");
-        setSortField(field);
-        setSortOrder(order as "asc" | "desc");
-        setPage(0);
-      }}
-      className="border rounded px-2 py-1 text-sm mt-1"
-    >
-      <option value="updatedAt,desc">🕒 По дате (новые → старые)</option>
-      <option value="updatedAt,asc">🕒 По дате (старые → новые)</option>
-      <option value="price,asc">💰 Цена (по возрастанию)</option>
-      <option value="price,desc">💰 Цена (по убыванию)</option>
-    </select>
-  </div>
-</details>
+        <details className="border rounded bg-white shadow p-3">
+          <summary className="cursor-pointer text-sm font-medium text-blue-600">🏙️ Города и Статус</summary>
+          <div className="mt-2 flex flex-col gap-3">
+            {showStatusFilter && (
+              <div>
+                <label className="text-sm font-medium text-gray-700">Статус:</label>
+                <select
+                  value={pendingStatus}
+                  onChange={(e) => setPendingStatus(e.target.value)}
+                  className="border rounded px-2 py-1 text-sm mt-1"
+                >
+                  <option value="">Все</option>
+                  <option value="ACTV">✅ Активные</option>
+                  <option value="DRFT">📝 Черновики</option>
+                  <option value="ARCH">📦 Архив</option>
+                </select>
+              </div>
+            )}
 
-{/* 🏷️ Статус */}
-{showStatusFilter && (
-  <details className="border rounded bg-white shadow p-3">
-    <summary className="cursor-pointer text-sm font-medium text-blue-600">
-      🏷️ Статус
-    </summary>
-    <div className="mt-2">
-      <label className="text-sm font-medium text-gray-700">Выберите:</label>
-      <select
-        value={status}
-        onChange={(e) => {
-          setStatus(e.target.value);
-          setPage(0);
-        }}
-        className="border rounded px-2 py-1 text-sm mt-1"
-      >
-        <option value="">Все</option>
-        <option value="ACTV">✅ Активные</option>
-        <option value="DRFT">📝 Черновики</option>
-        <option value="ARCH">📦 Архив</option>
-      </select>
-    </div>
-  </details>
-)}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Города:</label>
+              <div className="border rounded p-2 max-h-[150px] overflow-y-auto flex flex-col gap-1 bg-gray-50">
+                {cities.map((city) => (
+                  <label key={city.cityCode} className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      value={city.cityCode}
+                      checked={pendingCityCodes.includes(city.cityCode)}
+                      onChange={(e) => {
+                        const code = e.target.value;
+                        setPendingCityCodes((prev) =>
+                          e.target.checked ? [...prev, code] : prev.filter((c) => c !== code)
+                        );
+                      }}
+                    />
+                    {city.name}
+                  </label>
+                ))}
+              </div>
+            </div>
 
-{/* 🏙️ Города */}
-<details className="border rounded bg-white shadow p-3">
-  <summary className="cursor-pointer text-sm font-medium text-blue-600">
-    🏙️ Города
-  </summary>
-  <div className="mt-2">
-    <label className="block text-sm font-medium text-gray-700 mb-1">
-      Фильтр по городам:
-    </label>
-    <div className="border rounded p-2 max-h-[150px] overflow-y-auto flex flex-col gap-1 bg-gray-50">
-      {cities.map((city) => (
-        <label key={city.cityCode} className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            value={city.cityCode}
-            checked={pendingCityCodes.includes(city.cityCode)}
-            onChange={(e) => {
-              const code = e.target.value;
-              setPendingCityCodes((prev) =>
-                e.target.checked
-                  ? [...prev, code]
-                  : prev.filter((c) => c !== code)
-              );
-            }}
-          />
-          {city.name}
-        </label>
-      ))}
-    </div>
+            <div className="flex gap-2">
+              <button
+                onClick={handleApplyFilters}
+                className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+              >
+                🔍 Применить
+              </button>
+              <button
+                onClick={handleResetFilters}
+                className="px-3 py-1 bg-gray-400 text-white rounded hover:bg-gray-500 text-sm"
+              >
+                🧹 Сбросить
+              </button>
+            </div>
+          </div>
+        </details>
+      </div>
 
-    <div className="mt-2 flex gap-2">
-      <button
-        onClick={() => {
-          setSelectedCityCodes(pendingCityCodes);
-          setPage(0);
-        }}
-        className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
-      >
-        🔍 Применить
-      </button>
-
-      <button
-        onClick={() => {
-          setPendingCityCodes([]);
-          setSelectedCityCodes([]);
-          setStatus("");
-          setPage(0);
-        }}
-        className="px-3 py-1 bg-gray-400 text-white rounded hover:bg-gray-500 text-sm"
-      >
-        🔄 Сбросить
-      </button>
-    </div>
-  </div>
-</details>
-</div>
-
-
-
-
-      {/* 📃 Список офферов */}
       {loading ? (
         <p className="text-sm text-blue-500">Загрузка офферов...</p>
       ) : offers.length === 0 ? (
@@ -200,16 +183,13 @@ const OfferList: React.FC<Props> = ({ productId, other, showStatusFilter }) => {
         </ul>
       )}
 
-      {/* 📄 Пагинация */}
       {totalPages > 1 && (
         <div className="mt-4 flex gap-2 flex-wrap">
           {[...Array(totalPages)].map((_, i) => (
             <button
               key={i}
               onClick={() => setPage(i)}
-              className={`px-3 py-1 rounded ${
-                i === page ? "bg-blue-600 text-white" : "bg-gray-200"
-              }`}
+              className={`px-3 py-1 rounded ${i === page ? "bg-blue-600 text-white" : "bg-gray-200"}`}
             >
               {i + 1}
             </button>
@@ -217,7 +197,6 @@ const OfferList: React.FC<Props> = ({ productId, other, showStatusFilter }) => {
         </div>
       )}
 
-      {/* ✏ Модалка редактирования */}
       {editingOffer && (
         <OfferEditModal
           offer={editingOffer}

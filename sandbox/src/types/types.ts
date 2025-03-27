@@ -261,3 +261,9 @@ export interface AddressLocalDTO {
   id: number;
   title: string;
 }
+
+export interface OfferFilterRequest {
+  cities?: CityLocalDto[];
+  offerAttributeFormList?: OfferAttributeFormDTO[];
+  exact?: boolean;
+}

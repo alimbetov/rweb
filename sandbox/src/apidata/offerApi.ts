@@ -1,6 +1,6 @@
 // src/api/offerApi.ts
 import apiClient from "./apiClient";
-import { AddressLocalDTO, CityLocalDto, OfferFormDTO } from "../types/types"; // путь может отличаться
+import { AddressLocalDTO, CityLocalDto, OfferAttributeFormDTO, OfferFilterRequest, OfferFormDTO } from "../types/types"; // путь может отличаться
 import { AxiosResponse } from "axios";
 
 
@@ -74,25 +74,37 @@ export const fetchFilteredOffers_old = async (params: {
   return response.data;
 };
 
-interface OfferFilterParams {
+
+export interface OfferFilterParams {
   productId?: number;
   status?: string;
   other?: boolean;
   page?: number;
   size?: number;
   sort?: string;
-  cities?: CityLocalDto[]; // <-- добавлено!
+  cities?: CityLocalDto[];
+  offerAttributeFormList?: OfferAttributeFormDTO[]; // 🆕 добавляем
 }
 
-export const fetchFilteredOffers = async (params: OfferFilterParams): Promise<{
+export const fetchFilteredOffers = async (
+  params: OfferFilterParams
+): Promise<{
   content: OfferFormDTO[];
   totalElements: number;
   totalPages: number;
 }> => {
-  // 🔍 Разделим параметры
-  const { productId, status, other, page, size, sort, cities } = params;
+  const {
+    productId,
+    status,
+    other,
+    page,
+    size,
+    sort,
+    cities,
+    offerAttributeFormList, // 🆕 добавлено
+  } = params;
 
-  // 📦 Query-параметры (идут в URL)
+  // 📦 Query-параметры
   const queryParams = {
     productId,
     status,
@@ -102,20 +114,31 @@ export const fetchFilteredOffers = async (params: OfferFilterParams): Promise<{
     sort,
   };
 
-  // 📦 Body-параметры
+  // 📦 Body-параметры (соответствуют Java классу OfferFilterRequest)
   const body = {
-    cities: cities ?? [], // если undefined — передаем пустой список
+    cities: cities ?? [],
+    offerAttributeFormList: offerAttributeFormList ?? [],
   };
 
-  const response: AxiosResponse<any> = await apiClient.post(
-    "/api/offers/filter",
-    body,
-    {
-      params: queryParams,
-    }
-  );
+  const response: AxiosResponse<{
+    content: OfferFormDTO[];
+    totalElements: number;
+    totalPages: number;
+  }> = await apiClient.post("/api/offers/filter", body, {
+    params: queryParams,
+  });
 
   return response.data;
 };
 
+export const queryBuilderOffer = async (productId: number): Promise<OfferFilterRequest> => {
+  const response: AxiosResponse<OfferFilterRequest> = await apiClient.post(
+    "/api/offers/query-builder",
+    null,
+    {
+      params: { productId },
+    }
+  );
+  return response.data;
+};
 
