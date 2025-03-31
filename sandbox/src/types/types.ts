@@ -267,3 +267,6 @@ export interface OfferFilterRequest {
   offerAttributeFormList?: OfferAttributeFormDTO[];
   exact?: boolean;
 }
+
+
+

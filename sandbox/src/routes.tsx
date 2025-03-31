@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { useAuth } from "../src/context/AuthContext"; // ✅ Добавил `useAuth`
+
 import MainLayout from "./layouts/MainLayout";
 import ProtectedRoute from "../src/ProtectedRoute"; // ✅ Подключаем защиту маршрутов
 
@@ -33,6 +33,9 @@ import AttributeValueList from "./pages/AttributeValueList.tsx";
 import CityMapPage from "./pages/CityMapPage.tsx";
 import AddressMapPage from "./pages/AddressMapPage.tsx";
 import CatalogPage from "./pages/CatalogPage.tsx";
+import MediaGallery from "./pages/MediaGallery.tsx";
+import OfferViewPage from "./pages/OfferViewPage.tsx";
+import WorkingHoursForm from "./pages/WorkingHoursForm.tsx";
 
 // ✅ Страница 404
 const NotFound = () => (
@@ -140,6 +143,10 @@ const router = createBrowserRouter([
           { path: "guser/addresses/new", element: <AddressForm /> }, // ✅ Создание товара
           { path: "guser/addresses/edit/:id", element: <AddressForm /> }, // ✅ Редактирование товара
           { path: "guser/address/:addressId/map", element: <AddressMapPage /> }, // ✅ Редактирование товара
+          { path: "guser/offer/view/:offerId", element: <OfferViewPage /> }, 
+
+         
+
 
 
           {

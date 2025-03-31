@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { OfferFormDTO, CityLocalDto } from "../types/types";
-import { fetchFilteredOffers } from "../apidata/offerApi";
+import { OfferFormDTO, CityLocalDto,AddressLocalDTO } from "../types/types";
+import { fetchFilteredOffers , fetchUserPubAddress } from "../apidata/offerApi";
 import { fetchCities } from "../apidata/profileApi";
 import OfferEditModal from "./OfferEditModal";
+import { useNavigate } from "react-router-dom";
+import OfferViewCard from "./OfferViewCard";
+import MediaGalleryModal from "./MediaGalleryModal";
+import MediaGallery from "../pages/media/MediaGallery";
 
 interface Props {
   productId: number;
@@ -19,7 +23,7 @@ const OfferList: React.FC<Props> = ({ productId, other, showStatusFilter, custom
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
-
+  const navigate = useNavigate()
   const [editingOffer, setEditingOffer] = useState<OfferFormDTO | null>(null);
 
   const [sortField, setSortField] = useState("updatedAt");
@@ -31,7 +35,9 @@ const OfferList: React.FC<Props> = ({ productId, other, showStatusFilter, custom
 
   const [appliedCityCodes, setAppliedCityCodes] = useState<string[]>([]);
   const [appliedStatus, setAppliedStatus] = useState<string>("");
-
+  const [viewingOffer, setViewingOffer] = useState<OfferFormDTO | null>(null);
+  const [addressMap, setAddressMap] = useState<Record<number, AddressLocalDTO>>({})
+  const [viewingMedia, setViewingMedia] = useState<number | null>(null);
   useEffect(() => {
     fetchCities().then(setCities).catch(console.error);
   }, []);
@@ -171,14 +177,59 @@ const OfferList: React.FC<Props> = ({ productId, other, showStatusFilter, custom
       ) : (
         <ul className="space-y-2">
           {offers.map((offer) => (
-            <li
-              key={offer.offerId}
-              className="p-3 border rounded shadow-sm bg-white hover:bg-gray-50 cursor-pointer"
-              onClick={() => setEditingOffer(offer)}
-            >
-              💰 <strong>{offer.price} {offer.preferredCurrency}</strong><br />
-              📝 {offer.description || "Без описания"}
-            </li>
+<li key={offer.offerId} className="p-3 border rounded shadow-sm bg-white hover:bg-gray-50">
+<div className="flex gap-4 items-center">
+{/* 🖼️ Фото или заглушка */}
+{offer.offerPhotoUrl ? (
+<img
+src={offer.offerPhotoUrl}
+alt="Фото оффера"
+className="w-20 h-20 object-cover rounded-xl border"
+/>
+) : (
+<div className="w-20 h-20 flex items-center justify-center rounded-xl border border-gray-300 text-gray-400 text-xs text-center bg-gray-50">
+Нет фото
+</div>
+)}
+
+{/* 💬 Информация + кнопка */}
+<div className="flex-1">
+<div
+onClick={() => setEditingOffer(offer)}
+className="cursor-pointer text-sm space-y-1"
+>
+<div>
+💰 <strong>{offer.price} {offer.preferredCurrency}</strong>
+</div>
+<div>
+📝 {offer.description || <span className="text-gray-400 italic">Без описания</span>}
+</div>
+</div>
+</div>
+
+{/* 🔗 Кнопка медиа */}
+
+
+<button
+  onClick={() => setViewingMedia(offer.offerId)}
+  className="text-sm text-blue-600 hover:underline whitespace-nowrap"
+  title="Открыть медиа"
+>
+  📷 Медиа
+</button>
+
+<button
+  onClick={() => setViewingOffer(offer)}
+  className="text-sm text-blue-600 hover:underline whitespace-nowrap"
+  title="Открыть обзор"
+>
+  📷 обзор описания
+</button>
+
+</div>
+</li>
+
+
           ))}
         </ul>
       )}
@@ -204,6 +255,27 @@ const OfferList: React.FC<Props> = ({ productId, other, showStatusFilter, custom
           onSaved={handleSaved}
         />
       )}
+
+{viewingOffer && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
+    <div className="bg-white p-4 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-lg relative">
+      <button
+        onClick={() => setViewingOffer(null)}
+        className="absolute top-2 right-2 text-gray-600 hover:text-black text-xl"
+      >
+        ×
+      </button>
+      <OfferViewCard offer={viewingOffer} />
+    </div>
+  </div>
+)}
+
+{viewingMedia !== null && (
+  <MediaGalleryModal open={true} onClose={() => setViewingMedia(null)}>
+    <MediaGallery offerId={viewingMedia} />
+  </MediaGalleryModal>
+)}
+
     </div>
   );
 };

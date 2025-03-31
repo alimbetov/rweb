@@ -142,3 +142,10 @@ export const queryBuilderOffer = async (productId: number): Promise<OfferFilterR
   return response.data;
 };
 
+
+
+// 🔎 Получить оффер по ID
+export const fetchOfferById = async (id: number): Promise<OfferFormDTO> => {
+  const response = await apiClient.get(`/api/offers/${id}`);
+  return response.data;
+};
