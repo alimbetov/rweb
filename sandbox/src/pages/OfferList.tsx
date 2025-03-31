@@ -3,10 +3,10 @@ import { OfferFormDTO, CityLocalDto,AddressLocalDTO } from "../types/types";
 import { fetchFilteredOffers , fetchUserPubAddress } from "../apidata/offerApi";
 import { fetchCities } from "../apidata/profileApi";
 import OfferEditModal from "./OfferEditModal";
-import { useNavigate } from "react-router-dom";
 import OfferViewCard from "./OfferViewCard";
 import MediaGalleryModal from "./MediaGalleryModal";
 import MediaGallery from "../pages/media/MediaGallery";
+import WorkingHoursModal from "./WorkingHoursModal";
 
 interface Props {
   productId: number;
@@ -23,7 +23,7 @@ const OfferList: React.FC<Props> = ({ productId, other, showStatusFilter, custom
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate()
+ 
   const [editingOffer, setEditingOffer] = useState<OfferFormDTO | null>(null);
 
   const [sortField, setSortField] = useState("updatedAt");
@@ -38,6 +38,7 @@ const OfferList: React.FC<Props> = ({ productId, other, showStatusFilter, custom
   const [viewingOffer, setViewingOffer] = useState<OfferFormDTO | null>(null);
   const [addressMap, setAddressMap] = useState<Record<number, AddressLocalDTO>>({})
   const [viewingMedia, setViewingMedia] = useState<number | null>(null);
+  const [workingOfferId, setWorkingOfferId] = useState<number | null>(null);
   useEffect(() => {
     fetchCities().then(setCities).catch(console.error);
   }, []);
@@ -195,7 +196,6 @@ className="w-20 h-20 object-cover rounded-xl border"
 {/* 💬 Информация + кнопка */}
 <div className="flex-1">
 <div
-onClick={() => setEditingOffer(offer)}
 className="cursor-pointer text-sm space-y-1"
 >
 <div>
@@ -206,17 +206,34 @@ className="cursor-pointer text-sm space-y-1"
 </div>
 </div>
 </div>
+{!other && (
+  <>
+    <button
+      onClick={() => setEditingOffer(offer)}
+      className="text-sm text-blue-600 hover:underline whitespace-nowrap"
+      title="Редакция формы"
+    >
+      Редакция
+    </button>
+    <button
+      onClick={() => setViewingMedia(offer.offerId)}
+      className="text-sm text-blue-600 hover:underline whitespace-nowrap"
+      title="Открыть медиа"
+    >
+      📷 редакция Медиа
+    </button>
 
-{/* 🔗 Кнопка медиа */}
+    <button
+      onClick={() => setWorkingOfferId(offer.offerId)}
+      className="text-sm text-blue-600 hover:underline whitespace-nowrap"
+      title="Редактировать график"
+    >
+      🕒 График
+    </button>
 
+  </>
+)}
 
-<button
-  onClick={() => setViewingMedia(offer.offerId)}
-  className="text-sm text-blue-600 hover:underline whitespace-nowrap"
-  title="Открыть медиа"
->
-  📷 Медиа
-</button>
 
 <button
   onClick={() => setViewingOffer(offer)}
@@ -274,6 +291,14 @@ className="cursor-pointer text-sm space-y-1"
   <MediaGalleryModal open={true} onClose={() => setViewingMedia(null)}>
     <MediaGallery offerId={viewingMedia} />
   </MediaGalleryModal>
+)}
+
+
+{workingOfferId !== null && (
+  <WorkingHoursModal
+    offerId={workingOfferId}
+    onClose={() => setWorkingOfferId(null)}
+  />
 )}
 
     </div>
