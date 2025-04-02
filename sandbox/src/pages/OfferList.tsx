@@ -86,6 +86,14 @@ const OfferList: React.FC<Props> = ({ productId, other, showStatusFilter, custom
     setPage(0);
   };
 
+  function formatPrice(price) {
+    return Number(price)
+      .toLocaleString('ru-RU', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+  }
+
   return (
     <div>
       {/* 📦 Фильтры */}
@@ -199,9 +207,11 @@ className="w-20 h-20 object-cover rounded-xl border"
 className="cursor-pointer text-sm space-y-1"
 >
 <div>
-💰 <strong>{offer.price} {offer.preferredCurrency}</strong>
+<strong>{formatPrice(offer.price)} {offer.preferredCurrency}</strong>
+
 </div>
 <div>
+  
 📝 {offer.description || <span className="text-gray-400 italic">Без описания</span>}
 </div>
 </div>

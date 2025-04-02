@@ -33,7 +33,7 @@ const CatalogPage: React.FC = () => {
   // Автопоказ фильтра при переходе на вкладку others
   useEffect(() => {
     if (tab === "others") {
-      setFilterVisible(true);
+      setFilterVisible(false);
     }
   }, [tab]);
 

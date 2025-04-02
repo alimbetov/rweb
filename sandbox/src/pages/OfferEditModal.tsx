@@ -109,7 +109,7 @@ const OfferEditModal: React.FC<Props> = ({ offer, onClose, onSaved }) => {
               value={form.price}
               onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
               className="w-2/3 border rounded px-3 py-2"
-              placeholder="Введите цену"
+              placeholder="price"
             />
             <select
               value={form.preferredCurrency}

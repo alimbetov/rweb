@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import { OfferFormDTO } from "../types/types";
 import OfferMediaTab from "./OfferMediaTab"; // 👈 подключаем
+import { fetchUserPubAddress } from "../apidata/offerApi";
 
 interface Props {
   offer: OfferFormDTO;
@@ -9,9 +10,37 @@ interface Props {
 const OfferViewCard: React.FC<Props> = ({ offer }) => {
   const [activeTab, setActiveTab] = useState<"DETAILS" | "MEDIA">("DETAILS");
 
+  const [addressTitle, setAddressTitle] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadAddress = async () => {
+      try {
+        const data = await fetchUserPubAddress(offer.addressId);
+        setAddressTitle(data.title);
+      } catch (e) {
+        console.warn("Не удалось загрузить адрес", e);
+      }
+    };
+
+    if (offer.addressId) {
+      loadAddress();
+    }
+  }, [offer.addressId]);
+
+
+
+  function formatPrice(price) {
+    return Number(price)
+      .toLocaleString('ru-RU', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+  }
   return (
     <div className="bg-white rounded-xl shadow-md p-4 text-sm space-y-4">
       <div className="flex gap-4 border-b mb-4 pb-2">
+
+        
         <button
           onClick={() => setActiveTab("DETAILS")}
           className={`px-3 py-1 rounded ${activeTab === "DETAILS" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
@@ -30,7 +59,7 @@ const OfferViewCard: React.FC<Props> = ({ offer }) => {
         <>
           <div className="flex justify-between items-center">
             <div className="text-lg font-semibold text-gray-800">
-              {offer.price} {currencyMap[offer.preferredCurrency]}
+            <strong>{formatPrice(offer.price)} {currencyMap[offer.preferredCurrency]}</strong>
             </div>
             <span className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600">
               {statusMap[offer.status]}
@@ -40,6 +69,13 @@ const OfferViewCard: React.FC<Props> = ({ offer }) => {
           {offer.description && (
             <p className="text-gray-700 whitespace-pre-wrap">{offer.description}</p>
           )}
+          
+  {addressTitle && (
+  <div className="text-gray-600">
+  <span className="font-medium">📍 Адрес размещения:</span> {addressTitle}
+  </div>
+    )}
+
 
           {offer.offerAttributeFormList.length > 0 && (
             <div className="border-t pt-3 mt-2">
