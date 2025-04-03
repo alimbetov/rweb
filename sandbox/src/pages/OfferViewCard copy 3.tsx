@@ -2,12 +2,6 @@ import React, { useState, useEffect } from "react";
 import { OfferFormDTO } from "../types/types";
 import { fetchUserPubAddress } from "../apidata/offerApi";
 import OfferMediaTab from "./OfferMediaTab";
-import {
-  fetchDeliveryTypes,
-  fetchPaymentTypes,
-  DeliveryTypeDTO,
-  PaymentTypeDTO,
-} from "../apidata/offerTypeApi";
 
 interface Props {
   offer: OfferFormDTO;
@@ -16,27 +10,21 @@ interface Props {
 const OfferViewCard: React.FC<Props> = ({ offer }) => {
   const [activeTab, setActiveTab] = useState<"DETAILS" | "HIDDEN">("DETAILS");
   const [addressTitle, setAddressTitle] = useState<string | null>(null);
-  const [deliveryTypes, setDeliveryTypes] = useState<DeliveryTypeDTO[]>([]);
-  const [paymentTypes, setPaymentTypes] = useState<PaymentTypeDTO[]>([]);
 
   useEffect(() => {
-    const loadData = async () => {
+    const loadAddress = async () => {
       try {
-        const [address, deliveries, payments] = await Promise.all([
-          fetchUserPubAddress(offer.addressId),
-          fetchDeliveryTypes(offer.offerId, true),
-          fetchPaymentTypes(offer.offerId, true),
-        ]);
-        setAddressTitle(address.title);
-        setDeliveryTypes(deliveries);
-        setPaymentTypes(payments);
+        const data = await fetchUserPubAddress(offer.addressId);
+        setAddressTitle(data.title);
       } catch (e) {
-        console.warn("Ошибка при загрузке данных:", e);
+        console.warn("Не удалось загрузить адрес", e);
       }
     };
 
-    loadData();
-  }, [offer.addressId, offer.offerId]);
+    if (offer.addressId) {
+      loadAddress();
+    }
+  }, [offer.addressId]);
 
   function formatPrice(price: number) {
     return Number(price).toLocaleString("ru-RU", {
@@ -47,7 +35,8 @@ const OfferViewCard: React.FC<Props> = ({ offer }) => {
 
   return (
     <div className="bg-white rounded-xl shadow-md p-4 text-sm space-y-4">
-      {/* 🖼️ Медиа */}
+
+      {/* 🖼️ Медиа всегда отображаются сверху */}
       <OfferMediaTab offerId={offer.offerId} />
 
       {/* Табы */}
@@ -84,7 +73,6 @@ const OfferViewCard: React.FC<Props> = ({ offer }) => {
             </div>
           )}
 
-          {/* 🧩 Характеристики */}
           {offer.offerAttributeFormList.length > 0 && (
             <div className="border-t pt-3 mt-2">
               <h4 className="font-medium text-gray-800 mb-2">🧩 Характеристики:</h4>
@@ -94,30 +82,6 @@ const OfferViewCard: React.FC<Props> = ({ offer }) => {
                     <span className="font-medium">{attr.attributeTitle || attr.attributeId}</span>
                     <span className="text-right text-gray-600">{renderAttributeValue(attr)}</span>
                   </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* 🚚 Виды доставки */}
-          {deliveryTypes.length > 0 && (
-            <div className="border-t pt-3 mt-2">
-              <h4 className="font-medium text-gray-800 mb-2">🚚 Доставка:</h4>
-              <ul className="list-disc list-inside text-gray-700">
-                {deliveryTypes.map((dt) => (
-                  <li key={dt.code}>{dt.name}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* 💳 Виды оплаты */}
-          {paymentTypes.length > 0 && (
-            <div className="border-t pt-3 mt-2">
-              <h4 className="font-medium text-gray-800 mb-2">💳 Оплата:</h4>
-              <ul className="list-disc list-inside text-gray-700">
-                {paymentTypes.map((pt) => (
-                  <li key={pt.code}>{pt.name}</li>
                 ))}
               </ul>
             </div>

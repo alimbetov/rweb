@@ -187,7 +187,22 @@ const MediaGalleryInline: React.FC<Props> = ({
     </button>
   </div>
 )}
-
+      {!hideUploader && (
+        <div
+          className={`border-2 border-dashed rounded-xl p-4 text-center mb-4 transition-colors ${
+            isDragging ? "border-blue-400 bg-blue-50" : "border-gray-300"
+          }`}
+          onDrop={handleDrop}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsDragging(true);
+          }}
+          onDragLeave={() => setIsDragging(false)}
+        >
+          <p className="text-gray-600 text-sm mb-2">Перетащите файлы или выберите вручную</p>
+          <input type="file" multiple onChange={handleUpload} className="mx-auto block" />
+        </div>
+      )}
 
       {isLoading && <p className="text-sm text-center text-gray-500">Загрузка...</p>}
 

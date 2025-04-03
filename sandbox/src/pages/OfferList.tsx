@@ -7,6 +7,7 @@ import OfferViewCard from "./OfferViewCard";
 import MediaGalleryModal from "./MediaGalleryModal";
 import MediaGallery from "../pages/media/MediaGallery";
 import WorkingHoursModal from "./WorkingHoursModal";
+import OfferTypeEditModal from "./OfferTypeEditModal";
 
 interface Props {
   productId: number;
@@ -39,6 +40,8 @@ const OfferList: React.FC<Props> = ({ productId, other, showStatusFilter, custom
   const [addressMap, setAddressMap] = useState<Record<number, AddressLocalDTO>>({})
   const [viewingMedia, setViewingMedia] = useState<number | null>(null);
   const [workingOfferId, setWorkingOfferId] = useState<number | null>(null);
+  const [editingOfferTypeId, setEditingOfferTypeId] = useState<number | null>(null);
+
   useEffect(() => {
     fetchCities().then(setCities).catch(console.error);
   }, []);
@@ -203,9 +206,9 @@ className="w-20 h-20 object-cover rounded-xl border"
 
 {/* 💬 Информация + кнопка */}
 <div className="flex-1">
-<div
-className="cursor-pointer text-sm space-y-1"
->
+  
+<div  onClick={() => setViewingOffer(offer)}
+ className="cursor-pointer text-sm space-y-1">
 <div>
 <strong>{formatPrice(offer.price)} {offer.preferredCurrency}</strong>
 
@@ -225,6 +228,15 @@ className="cursor-pointer text-sm space-y-1"
     >
       Редакция
     </button>
+
+<button
+  onClick={() => setEditingOfferTypeId(offer.offerId)}
+  className="text-sm text-blue-600 hover:underline whitespace-nowrap"
+  title="Редактировать типы"
+>
+  🚚💳 Типы
+</button>
+
     <button
       onClick={() => setViewingMedia(offer.offerId)}
       className="text-sm text-blue-600 hover:underline whitespace-nowrap"
@@ -245,13 +257,7 @@ className="cursor-pointer text-sm space-y-1"
 )}
 
 
-<button
-  onClick={() => setViewingOffer(offer)}
-  className="text-sm text-blue-600 hover:underline whitespace-nowrap"
-  title="Открыть обзор"
->
-  📷 обзор описания
-</button>
+
 
 </div>
 </li>
@@ -308,6 +314,13 @@ className="cursor-pointer text-sm space-y-1"
   <WorkingHoursModal
     offerId={workingOfferId}
     onClose={() => setWorkingOfferId(null)}
+  />
+)}
+
+{editingOfferTypeId !== null && (
+  <OfferTypeEditModal
+    offerId={editingOfferTypeId}
+    onClose={() => setEditingOfferTypeId(null)}
   />
 )}
 
